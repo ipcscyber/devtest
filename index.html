@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dexxter Services - Developer Recruitment</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Government Style Header -->
+    <header class="government-header">
+        <div class="header-container">
+            <div class="header-brand">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Dexxter Services</span>
+                </div>
+                <div class="header-tagline">Official Developer Recruitment Platform</div>
+            </div>
+            <div class="security-badges">
+                <div class="security-badge">
+                    <i class="fas fa-lock"></i>
+                    <span>Secure Session</span>
+                </div>
+                <div class="security-badge">
+                    <i class="fas fa-robot"></i>
+                    <span>AI Monitoring</span>
+                </div>
+                <div class="security-badge">
+                    <i class="fas fa-clock"></i>
+                    <span id="sessionTimer">00:00:00</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Application Container -->
+    <main class="application-container">
+        <!-- Progress Bar -->
+        <div class="progress-section">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-steps">
+                <div class="step active" data-step="1">
+                    <span class="step-number">1</span>
+                    <span class="step-label">Personal Info</span>
+                </div>
+                <div class="step" data-step="2">
+                    <span class="step-number">2</span>
+                    <span class="step-label">Technical Test</span>
+                </div>
+                <div class="step" data-step="3">
+                    <span class="step-number">3</span>
+                    <span class="step-label">Submission</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: Personal Information -->
+        <section id="personalInfoSection" class="form-section active">
+            <div class="section-header">
+                <h2><i class="fas fa-user"></i> Applicant Information</h2>
+                <p class="section-subtitle">Official Application Form - Dexxter Services</p>
+            </div>
+
+            <form id="personalInfoForm" class="government-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="fullName">
+                            <i class="fas fa-signature"></i>
+                            Full Legal Name *
+                        </label>
+                        <input type="text" id="fullName" name="fullName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="robloxUsername">
+                            <i class="fas fa-gamepad"></i>
+                            Roblox Username *
+                        </label>
+                        <input type="text" id="robloxUsername" name="robloxUsername" required>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="discordId">
+                            <i class="fab fa-discord"></i>
+                            Discord ID *
+                        </label>
+                        <input type="text" id="discordId" name="discordId" placeholder="username#1234" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="age">
+                            <i class="fas fa-birthday-cake"></i>
+                            Age *
+                        </label>
+                        <input type="number" id="age" name="age" min="16" max="99" required>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nationality">
+                            <i class="fas fa-globe"></i>
+                            Nationality *
+                        </label>
+                        <select id="nationality" name="nationality" required>
+                            <option value="">Select Nationality</option>
+                            <option value="french">French</option>
+                            <option value="other_eu">Other EU Country</option>
+                            <option value="non_eu">Non-EU Country</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="timezone">
+                            <i class="fas fa-clock"></i>
+                            Timezone *
+                        </label>
+                        <select id="timezone" name="timezone" required>
+                            <option value="">Select Timezone</option>
+                            <option value="cet">CET (Central European Time)</option>
+                            <option value="gmt">GMT (Greenwich Mean Time)</option>
+                            <option value="est">EST (Eastern Standard Time)</option>
+                            <option value="pst">PST (Pacific Standard Time)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="availability">
+                            <i class="fas fa-calendar-alt"></i>
+                            Availability (Hours per Week) *
+                        </label>
+                        <select id="availability" name="availability" required>
+                            <option value="">Select Availability</option>
+                            <option value="1-10">1-10 hours</option>
+                            <option value="10-20">10-20 hours</option>
+                            <option value="20-30">20-30 hours</option>
+                            <option value="30+">30+ hours</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="experience">
+                            <i class="fas fa-code"></i>
+                            Development Experience (Years) *
+                        </label>
+                        <select id="experience" name="experience" required>
+                            <option value="">Select Experience</option>
+                            <option value="0-1">0-1 year</option>
+                            <option value="1-2">1-2 years</option>
+                            <option value="2-3">2-3 years</option>
+                            <option value="3-5">3-5 years</option>
+                            <option value="5+">5+ years</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="motivation">
+                        <i class="fas fa-question-circle"></i>
+                        Why do you want to join Dexxter Services? *
+                    </label>
+                    <textarea id="motivation" name="motivation" rows="4" 
+                              placeholder="Explain your motivation for joining our team, your goals, and what you can contribute..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="portfolio">
+                        <i class="fas fa-link"></i>
+                        Portfolio or GitHub Links
+                    </label>
+                    <input type="url" id="portfolio" name="portfolio" placeholder="https://github.com/yourusername">
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-primary" onclick="startTechnicalTest()">
+                        Start Technical Test
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Section 2: Technical Assessment -->
+        <section id="technicalTestSection" class="form-section">
+            <div class="assessment-header">
+                <h2><i class="fas fa-laptop-code"></i> Technical Assessment</h2>
+                <div class="assessment-controls">
+                    <div class="control-group">
+                        <button class="control-btn btn-skip" onclick="skipQuestion()">
+                            <i class="fas fa-forward"></i>
+                            Skip Question
+                            <span class="skip-counter">(2)</span>
+                        </button>
+                        <button class="control-btn btn-help" onclick="callAdmin()">
+                            <i class="fas fa-life-ring"></i>
+                            Call Admin
+                        </button>
+                    </div>
+                    <div class="control-group">
+                        <button class="control-btn btn-editor" onclick="openCodeEditor()">
+                            <i class="fas fa-code"></i>
+                            Code Editor
+                        </button>
+                        <button class="control-btn btn-save" onclick="saveProgress()">
+                            <i class="fas fa-save"></i>
+                            Save Progress
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="monitoring-panel">
+                <div class="monitor-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Time: <strong id="assessmentTimer">00:00:00</strong></span>
+                </div>
+                <div class="monitor-item">
+                    <i class="fas fa-tasks"></i>
+                    <span>Progress: <strong id="questionProgress">1/18</strong></span>
+                </div>
+                <div class="monitor-item ai-monitor">
+                    <i class="fas fa-robot"></i>
+                    <span>AI Detection: <strong class="status-active">ACTIVE</strong></span>
+                </div>
+                <div class="monitor-item">
+                    <i class="fas fa-eye"></i>
+                    <span>Focus: <strong class="status-ok">ACTIVE</strong></span>
+                </div>
+            </div>
+
+            <!-- Questions will be dynamically loaded here -->
+            <div id="questionsContainer"></div>
+
+            <div class="navigation-actions">
+                <button class="btn btn-secondary" onclick="previousQuestion()">
+                    <i class="fas fa-arrow-left"></i>
+                    Previous
+                </button>
+                <button class="btn btn-primary" onclick="nextQuestion()">
+                    Next
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Section 3: Submission -->
+        <section id="submissionSection" class="form-section">
+            <div class="submission-header">
+                <div class="submission-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2>Application Complete</h2>
+                <p>Thank you for completing the Dexxter Services developer application.</p>
+            </div>
+
+            <div class="submission-summary">
+                <div class="summary-card">
+                    <h3><i class="fas fa-info-circle"></i> Application Summary</h3>
+                    <div id="applicationSummary"></div>
+                </div>
+                
+                <div class="summary-card">
+                    <h3><i class="fas fa-shield-alt"></i> Security Verification</h3>
+                    <div class="verification-list">
+                        <div class="verification-item success">
+                            <i class="fas fa-check"></i>
+                            <span>AI Detection: No suspicious activity</span>
+                        </div>
+                        <div class="verification-item success">
+                            <i class="fas fa-check"></i>
+                            <span>Session Integrity: Verified</span>
+                        </div>
+                        <div class="verification-item success">
+                            <i class="fas fa-check"></i>
+                            <span>Time Monitoring: Normal</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="submission-actions">
+                <button class="btn btn-success" onclick="submitApplication()">
+                    <i class="fas fa-paper-plane"></i>
+                    Submit Application
+                </button>
+                <button class="btn btn-secondary" onclick="reviewApplication()">
+                    <i class="fas fa-edit"></i>
+                    Review Answers
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Code Editor Modal -->
+    <div id="codeEditorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-code"></i>
+                    Advanced Code Editor
+                </h3>
+                <button class="modal-close" onclick="closeCodeEditor()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="editor-toolbar">
+                    <button onclick="insertCodeSnippet()" class="toolbar-btn">
+                        <i class="fas fa-plus"></i>
+                        Insert Snippet
+                    </button>
+                    <button onclick="formatCode()" class="toolbar-btn">
+                        <i class="fas fa-indent"></i>
+                        Format Code
+                    </button>
+                    <button onclick="checkSyntax()" class="toolbar-btn">
+                        <i class="fas fa-check"></i>
+                        Check Syntax
+                    </button>
+                    <select onchange="changeTheme(this.value)" class="theme-selector">
+                        <option value="light">Light Theme</option>
+                        <option value="dark">Dark Theme</option>
+                        <option value="monokai">Monokai</option>
+                    </select>
+                </div>
+                <div class="editor-area">
+                    <textarea id="advancedEditor" placeholder="// Write your code here..."></textarea>
+                </div>
+                <div class="editor-footer">
+                    <div class="editor-info">
+                        <span id="lineInfo">Line: 1, Column: 1</span>
+                        <span class="language-tag">Luau</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button onclick="applyCode()" class="btn btn-primary">
+                    <i class="fas fa-check"></i>
+                    Apply to Answer
+                </button>
+                <button onclick="closeCodeEditor()" class="btn btn-secondary">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification System -->
+    <div id="notification" class="notification">
+        <div class="notification-content">
+            <i class="fas fa-bell"></i>
+            <span id="notificationMessage"></span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
