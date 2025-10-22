@@ -21,11 +21,7 @@
             <div class="security-badges">
                 <div class="security-badge">
                     <i class="fas fa-lock"></i>
-                    <span>Secure Session</span>
-                </div>
-                <div class="security-badge">
-                    <i class="fas fa-robot"></i>
-                    <span>AI Monitoring</span>
+                    <span>Protected Session</span>
                 </div>
                 <div class="security-badge">
                     <i class="fas fa-clock"></i>
@@ -37,8 +33,75 @@
 
     <!-- Main Application Container -->
     <main class="application-container">
+        <!-- Rules Section -->
+        <section id="rulesSection" class="form-section active">
+            <div class="section-header">
+                <h2><i class="fas fa-gavel"></i> Examination Rules</h2>
+                <p class="section-subtitle">Please read carefully before starting</p>
+            </div>
+
+            <div class="rules-container">
+                <div class="rules-list">
+                    <div class="rule-item">
+                        <i class="fas fa-robot rule-icon prohibited"></i>
+                        <div class="rule-content">
+                            <h3>Artificial Intelligence</h3>
+                            <p>Use of AI assistants (ChatGPT, Copilot, etc.) is strictly prohibited and will result in immediate disqualification.</p>
+                        </div>
+                    </div>
+
+                    <div class="rule-item">
+                        <i class="fas fa-undo rule-icon prohibited"></i>
+                        <div class="rule-content">
+                            <h3>No Back Navigation</h3>
+                            <p>You cannot return to previous questions. Each answer is final once you proceed to the next question.</p>
+                        </div>
+                    </div>
+
+                    <div class="rule-item">
+                        <i class="fas fa-infinity rule-icon allowed"></i>
+                        <div class="rule-content">
+                            <h3>Unlimited Time</h3>
+                            <p>Take as much time as you need. There is no time limit for this examination.</p>
+                        </div>
+                    </div>
+
+                    <div class="rule-item">
+                        <i class="fas fa-forward rule-icon allowed"></i>
+                        <div class="rule-content">
+                            <h3>Unlimited Skips</h3>
+                            <p>You can skip questions and return to them later if needed.</p>
+                        </div>
+                    </div>
+
+                    <div class="rule-item">
+                        <i class="fas fa-eye rule-icon monitoring"></i>
+                        <div class="rule-content">
+                            <h3>Session Monitoring</h3>
+                            <p>Your session is being monitored for integrity and fairness.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rules-agreement">
+                    <label class="agreement-checkbox">
+                        <input type="checkbox" id="agreeRules" onchange="toggleStartButton()">
+                        <span class="checkmark"></span>
+                        I have read and understand all the rules. I agree to complete this examination without external assistance.
+                    </label>
+                </div>
+
+                <div class="rules-actions">
+                    <button id="startApplicationBtn" class="btn btn-primary" disabled onclick="startApplication()">
+                        Begin Application
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
         <!-- Progress Bar -->
-        <div class="progress-section">
+        <div class="progress-section" style="display: none;" id="progressSection">
             <div class="progress-bar">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
@@ -59,7 +122,7 @@
         </div>
 
         <!-- Section 1: Personal Information -->
-        <section id="personalInfoSection" class="form-section active">
+        <section id="personalInfoSection" class="form-section">
             <div class="section-header">
                 <h2><i class="fas fa-user"></i> Applicant Information</h2>
                 <p class="section-subtitle">Official Application Form - Dexxter Services</p>
@@ -193,11 +256,10 @@
                         <button class="control-btn btn-skip" onclick="skipQuestion()">
                             <i class="fas fa-forward"></i>
                             Skip Question
-                            <span class="skip-counter">(2)</span>
                         </button>
                         <button class="control-btn btn-help" onclick="callAdmin()">
                             <i class="fas fa-life-ring"></i>
-                            Call Admin
+                            Request Assistance
                         </button>
                     </div>
                     <div class="control-group">
@@ -216,19 +278,15 @@
             <div class="monitoring-panel">
                 <div class="monitor-item">
                     <i class="fas fa-clock"></i>
-                    <span>Time: <strong id="assessmentTimer">00:00:00</strong></span>
+                    <span>Session Time: <strong id="assessmentTimer">00:00:00</strong></span>
                 </div>
                 <div class="monitor-item">
                     <i class="fas fa-tasks"></i>
                     <span>Progress: <strong id="questionProgress">1/18</strong></span>
                 </div>
-                <div class="monitor-item ai-monitor">
-                    <i class="fas fa-robot"></i>
-                    <span>AI Detection: <strong class="status-active">ACTIVE</strong></span>
-                </div>
                 <div class="monitor-item">
-                    <i class="fas fa-eye"></i>
-                    <span>Focus: <strong class="status-ok">ACTIVE</strong></span>
+                    <i class="fas fa-check-circle"></i>
+                    <span>Status: <strong class="status-ok">ACTIVE</strong></span>
                 </div>
             </div>
 
@@ -236,12 +294,8 @@
             <div id="questionsContainer"></div>
 
             <div class="navigation-actions">
-                <button class="btn btn-secondary" onclick="previousQuestion()">
-                    <i class="fas fa-arrow-left"></i>
-                    Previous
-                </button>
                 <button class="btn btn-primary" onclick="nextQuestion()">
-                    Next
+                    Next Question
                     <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
@@ -264,19 +318,19 @@
                 </div>
                 
                 <div class="summary-card">
-                    <h3><i class="fas fa-shield-alt"></i> Security Verification</h3>
+                    <h3><i class="fas fa-shield-alt"></i> Session Verification</h3>
                     <div class="verification-list">
-                        <div class="verification-item success">
-                            <i class="fas fa-check"></i>
-                            <span>AI Detection: No suspicious activity</span>
-                        </div>
                         <div class="verification-item success">
                             <i class="fas fa-check"></i>
                             <span>Session Integrity: Verified</span>
                         </div>
                         <div class="verification-item success">
                             <i class="fas fa-check"></i>
-                            <span>Time Monitoring: Normal</span>
+                            <span>Examination Rules: Compliant</span>
+                        </div>
+                        <div class="verification-item success">
+                            <i class="fas fa-check"></i>
+                            <span>Submission Ready: Yes</span>
                         </div>
                     </div>
                 </div>
@@ -286,10 +340,6 @@
                 <button class="btn btn-success" onclick="submitApplication()">
                     <i class="fas fa-paper-plane"></i>
                     Submit Application
-                </button>
-                <button class="btn btn-secondary" onclick="reviewApplication()">
-                    <i class="fas fa-edit"></i>
-                    Review Answers
                 </button>
             </div>
         </section>
@@ -322,9 +372,9 @@
                         Check Syntax
                     </button>
                     <select onchange="changeTheme(this.value)" class="theme-selector">
-                        <option value="light">Light Theme</option>
                         <option value="dark">Dark Theme</option>
                         <option value="monokai">Monokai</option>
+                        <option value="light">Light Theme</option>
                     </select>
                 </div>
                 <div class="editor-area">
