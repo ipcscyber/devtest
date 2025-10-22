@@ -6,8 +6,21 @@
     <title>Dexxter Services - Developer Recruitment</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <i class="fas fa-shield-alt"></i>
+                <span>Dexxter Services</span>
+            </div>
+            <div class="loading-spinner"></div>
+            <p>Initializing Secure Recruitment Platform...</p>
+        </div>
+    </div>
+
     <!-- Government Style Header -->
     <header class="government-header">
         <div class="header-container">
@@ -21,11 +34,15 @@
             <div class="security-badges">
                 <div class="security-badge">
                     <i class="fas fa-lock"></i>
-                    <span>Protected Session</span>
+                    <span>Secure Session</span>
                 </div>
                 <div class="security-badge">
                     <i class="fas fa-clock"></i>
                     <span id="sessionTimer">00:00:00</span>
+                </div>
+                <div class="security-badge" id="connectionStatus">
+                    <i class="fas fa-wifi"></i>
+                    <span>Online</span>
                 </div>
             </div>
         </div>
@@ -36,65 +53,106 @@
         <!-- Rules Section -->
         <section id="rulesSection" class="form-section active">
             <div class="section-header">
-                <h2><i class="fas fa-gavel"></i> Examination Rules</h2>
-                <p class="section-subtitle">Please read carefully before starting</p>
+                <div class="section-icon">
+                    <i class="fas fa-gavel"></i>
+                </div>
+                <h1>Examination Agreement</h1>
+                <p class="section-subtitle">Professional Developer Assessment - Dexxter Services</p>
             </div>
 
             <div class="rules-container">
-                <div class="rules-list">
-                    <div class="rule-item">
-                        <i class="fas fa-robot rule-icon prohibited"></i>
-                        <div class="rule-content">
-                            <h3>Artificial Intelligence</h3>
-                            <p>Use of AI assistants (ChatGPT, Copilot, etc.) is strictly prohibited and will result in immediate disqualification.</p>
-                        </div>
+                <div class="rules-card">
+                    <div class="rules-header">
+                        <h2><i class="fas fa-list-alt"></i> Assessment Guidelines</h2>
+                        <div class="rules-badge">Mandatory</div>
                     </div>
-
-                    <div class="rule-item">
-                        <i class="fas fa-undo rule-icon prohibited"></i>
-                        <div class="rule-content">
-                            <h3>No Back Navigation</h3>
-                            <p>You cannot return to previous questions. Each answer is final once you proceed to the next question.</p>
+                    
+                    <div class="rules-list">
+                        <div class="rule-item critical">
+                            <div class="rule-icon">
+                                <i class="fas fa-ban"></i>
+                            </div>
+                            <div class="rule-content">
+                                <h3>Strictly Prohibited</h3>
+                                <p>Use of AI assistants (ChatGPT, Copilot, Claude, etc.), external help, or code generation tools is strictly forbidden and will result in immediate disqualification.</p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="rule-item">
-                        <i class="fas fa-infinity rule-icon allowed"></i>
-                        <div class="rule-content">
-                            <h3>Unlimited Time</h3>
-                            <p>Take as much time as you need. There is no time limit for this examination.</p>
+                        <div class="rule-item important">
+                            <div class="rule-icon">
+                                <i class="fas fa-forward"></i>
+                            </div>
+                            <div class="rule-content">
+                                <h3>Forward Navigation Only</h3>
+                                <p>You cannot return to previous questions. Each answer is final once you proceed to the next question.</p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="rule-item">
-                        <i class="fas fa-forward rule-icon allowed"></i>
-                        <div class="rule-content">
-                            <h3>Unlimited Skips</h3>
-                            <p>You can skip questions and return to them later if needed.</p>
+                        <div class="rule-item info">
+                            <div class="rule-icon">
+                                <i class="fas fa-redo"></i>
+                            </div>
+                            <div class="rule-content">
+                                <h3>Limited Skips Available</h3>
+                                <p>You have <strong>5 skip credits</strong> available. Use them strategically for questions you wish to revisit later.</p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="rule-item">
-                        <i class="fas fa-eye rule-icon monitoring"></i>
-                        <div class="rule-content">
-                            <h3>Session Monitoring</h3>
-                            <p>Your session is being monitored for integrity and fairness.</p>
+                        <div class="rule-item info">
+                            <div class="rule-icon">
+                                <i class="fas fa-infinity"></i>
+                            </div>
+                            <div class="rule-content">
+                                <h3>Unlimited Time</h3>
+                                <p>Take as much time as you need. Quality and accuracy are more important than speed.</p>
+                            </div>
+                        </div>
+
+                        <div class="rule-item warning">
+                            <div class="rule-icon">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="rule-content">
+                                <h3>Session Integrity Monitoring</h3>
+                                <p>Your session is actively monitored for security and fairness. Any suspicious activity will be flagged.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="rules-agreement">
-                    <label class="agreement-checkbox">
-                        <input type="checkbox" id="agreeRules" onchange="toggleStartButton()">
-                        <span class="checkmark"></span>
-                        I have read and understand all the rules. I agree to complete this examination without external assistance.
-                    </label>
+                <div class="agreement-section">
+                    <div class="agreement-card">
+                        <h3><i class="fas fa-file-signature"></i> Legal Agreement</h3>
+                        <div class="agreement-text">
+                            <p>By proceeding with this assessment, you agree to:</p>
+                            <ul>
+                                <li>Complete this examination without any external assistance</li>
+                                <li>Abide by all Dexxter Services recruitment policies</li>
+                                <li>Accept that all submissions are final and binding</li>
+                                <li>Understand that violation of rules will result in permanent disqualification</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="agreement-checkbox">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="agreeRules" onchange="toggleStartButton()">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-label">
+                                    I have read, understood, and agree to all terms and conditions of this assessment.
+                                    <span class="checkbox-required">* Required</span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="rules-actions">
-                    <button id="startApplicationBtn" class="btn btn-primary" disabled onclick="startApplication()">
-                        Begin Application
-                        <i class="fas fa-arrow-right"></i>
+                    <button id="startApplicationBtn" class="btn btn-primary btn-large" disabled onclick="startApplication()">
+                        <span class="btn-content">
+                            <i class="fas fa-play-circle"></i>
+                            Begin Professional Assessment
+                        </span>
+                        <div class="btn-subtext">Start your journey with Dexxter Services</div>
                     </button>
                 </div>
             </div>
@@ -102,21 +160,29 @@
 
         <!-- Progress Bar -->
         <div class="progress-section" style="display: none;" id="progressSection">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-            <div class="progress-steps">
-                <div class="step active" data-step="1">
-                    <span class="step-number">1</span>
-                    <span class="step-label">Personal Info</span>
+            <div class="progress-container">
+                <div class="progress-info">
+                    <div class="progress-text">
+                        <span class="progress-label">Assessment Progress</span>
+                        <span class="progress-percentage" id="progressPercentage">0%</span>
+                    </div>
+                    <div class="progress-stats">
+                        <span class="stat-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span id="completedStats">0</span> answered
+                        </span>
+                        <span class="stat-item">
+                            <i class="fas fa-forward"></i>
+                            <span id="skipStats">5</span> skips left
+                        </span>
+                        <span class="stat-item">
+                            <i class="fas fa-clock"></i>
+                            <span id="timeStats">00:00:00</span>
+                        </span>
+                    </div>
                 </div>
-                <div class="step" data-step="2">
-                    <span class="step-number">2</span>
-                    <span class="step-label">Technical Test</span>
-                </div>
-                <div class="step" data-step="3">
-                    <span class="step-number">3</span>
-                    <span class="step-label">Submission</span>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
                 </div>
             </div>
         </div>
@@ -124,8 +190,11 @@
         <!-- Section 1: Personal Information -->
         <section id="personalInfoSection" class="form-section">
             <div class="section-header">
-                <h2><i class="fas fa-user"></i> Applicant Information</h2>
-                <p class="section-subtitle">Official Application Form - Dexxter Services</p>
+                <div class="section-icon">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <h1>Candidate Profile</h1>
+                <p class="section-subtitle">Professional Information - Dexxter Services Database</p>
             </div>
 
             <form id="personalInfoForm" class="government-form">
@@ -135,14 +204,18 @@
                             <i class="fas fa-signature"></i>
                             Full Legal Name *
                         </label>
-                        <input type="text" id="fullName" name="fullName" required>
+                        <input type="text" id="fullName" name="fullName" required 
+                               placeholder="Enter your full legal name as per identification">
+                        <div class="form-hint">Must match your official documents</div>
                     </div>
                     <div class="form-group">
                         <label for="robloxUsername">
                             <i class="fas fa-gamepad"></i>
                             Roblox Username *
                         </label>
-                        <input type="text" id="robloxUsername" name="robloxUsername" required>
+                        <input type="text" id="robloxUsername" name="robloxUsername" required 
+                               placeholder="Your exact Roblox display name">
+                        <div class="form-hint">Case-sensitive username</div>
                     </div>
                 </div>
 
@@ -152,25 +225,29 @@
                             <i class="fab fa-discord"></i>
                             Discord ID *
                         </label>
-                        <input type="text" id="discordId" name="discordId" placeholder="username#1234" required>
+                        <input type="text" id="discordId" name="discordId" 
+                               placeholder="username#1234" required>
+                        <div class="form-hint">Include discriminator (#0000)</div>
                     </div>
                     <div class="form-group">
                         <label for="age">
                             <i class="fas fa-birthday-cake"></i>
                             Age *
                         </label>
-                        <input type="number" id="age" name="age" min="16" max="99" required>
+                        <input type="number" id="age" name="age" min="16" max="99" required 
+                               placeholder="Your current age">
+                        <div class="form-hint">Must be 16 years or older</div>
                     </div>
                 </div>
 
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="nationality">
-                            <i class="fas fa-globe"></i>
+                            <i class="fas fa-globe-americas"></i>
                             Nationality *
                         </label>
                         <select id="nationality" name="nationality" required>
-                            <option value="">Select Nationality</option>
+                            <option value="">Select your nationality</option>
                             <option value="french">French</option>
                             <option value="other_eu">Other EU Country</option>
                             <option value="non_eu">Non-EU Country</option>
@@ -182,11 +259,12 @@
                             Timezone *
                         </label>
                         <select id="timezone" name="timezone" required>
-                            <option value="">Select Timezone</option>
+                            <option value="">Select your timezone</option>
                             <option value="cet">CET (Central European Time)</option>
                             <option value="gmt">GMT (Greenwich Mean Time)</option>
                             <option value="est">EST (Eastern Standard Time)</option>
                             <option value="pst">PST (Pacific Standard Time)</option>
+                            <option value="other">Other Timezone</option>
                         </select>
                     </div>
                 </div>
@@ -195,53 +273,60 @@
                     <div class="form-group">
                         <label for="availability">
                             <i class="fas fa-calendar-alt"></i>
-                            Availability (Hours per Week) *
+                            Weekly Availability *
                         </label>
                         <select id="availability" name="availability" required>
-                            <option value="">Select Availability</option>
+                            <option value="">Select hours per week</option>
                             <option value="1-10">1-10 hours</option>
                             <option value="10-20">10-20 hours</option>
                             <option value="20-30">20-30 hours</option>
                             <option value="30+">30+ hours</option>
                         </select>
+                        <div class="form-hint">Expected weekly commitment</div>
                     </div>
                     <div class="form-group">
                         <label for="experience">
-                            <i class="fas fa-code"></i>
-                            Development Experience (Years) *
+                            <i class="fas fa-code-branch"></i>
+                            Development Experience *
                         </label>
                         <select id="experience" name="experience" required>
-                            <option value="">Select Experience</option>
-                            <option value="0-1">0-1 year</option>
-                            <option value="1-2">1-2 years</option>
-                            <option value="2-3">2-3 years</option>
-                            <option value="3-5">3-5 years</option>
-                            <option value="5+">5+ years</option>
+                            <option value="">Select years of experience</option>
+                            <option value="0-1">0-1 year (Beginner)</option>
+                            <option value="1-2">1-2 years (Intermediate)</option>
+                            <option value="2-3">2-3 years (Advanced)</option>
+                            <option value="3-5">3-5 years (Expert)</option>
+                            <option value="5+">5+ years (Senior)</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="motivation">
-                        <i class="fas fa-question-circle"></i>
-                        Why do you want to join Dexxter Services? *
+                        <i class="fas fa-bullseye"></i>
+                        Professional Motivation *
                     </label>
-                    <textarea id="motivation" name="motivation" rows="4" 
-                              placeholder="Explain your motivation for joining our team, your goals, and what you can contribute..." required></textarea>
+                    <textarea id="motivation" name="motivation" rows="5" 
+                              placeholder="Describe your motivation for joining Dexxter Services, your career goals, technical interests, and what unique value you can bring to our team..." required></textarea>
+                    <div class="form-hint">Minimum 200 characters recommended</div>
                 </div>
 
                 <div class="form-group">
                     <label for="portfolio">
-                        <i class="fas fa-link"></i>
-                        Portfolio or GitHub Links
+                        <i class="fas fa-project-diagram"></i>
+                        Portfolio & GitHub
                     </label>
-                    <input type="url" id="portfolio" name="portfolio" placeholder="https://github.com/yourusername">
+                    <input type="url" id="portfolio" name="portfolio" 
+                           placeholder="https://github.com/yourusername or portfolio link">
+                    <div class="form-hint">Optional but recommended for experienced developers</div>
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" class="btn btn-primary" onclick="startTechnicalTest()">
-                        Start Technical Test
-                        <i class="fas fa-arrow-right"></i>
+                    <button type="button" class="btn btn-primary btn-large" onclick="validateAndStartTechnicalTest()">
+                        <span class="btn-content">
+                            <i class="fas fa-laptop-code"></i>
+                            Proceed to Technical Assessment
+                        </span>
+                        <div class="btn-subtext">Continue to skill evaluation</div>
                     </button>
                 </div>
             </form>
@@ -250,26 +335,30 @@
         <!-- Section 2: Technical Assessment -->
         <section id="technicalTestSection" class="form-section">
             <div class="assessment-header">
-                <h2><i class="fas fa-laptop-code"></i> Technical Assessment</h2>
+                <div class="assessment-title">
+                    <h1><i class="fas fa-laptop-code"></i> Technical Competency Assessment</h1>
+                    <p>Demonstrate your expertise in Roblox exploitation and Lua development</p>
+                </div>
                 <div class="assessment-controls">
                     <div class="control-group">
-                        <button class="control-btn btn-skip" onclick="skipQuestion()">
-                            <i class="fas fa-forward"></i>
+                        <button class="control-btn btn-skip" onclick="skipQuestion()" id="skipButton">
+                            <i class="fas fa-step-forward"></i>
                             Skip Question
+                            <span class="skip-counter" id="skipCounter">5</span>
                         </button>
                         <button class="control-btn btn-help" onclick="callAdmin()">
-                            <i class="fas fa-life-ring"></i>
-                            Request Assistance
+                            <i class="fas fa-headset"></i>
+                            Request Support
                         </button>
                     </div>
                     <div class="control-group">
                         <button class="control-btn btn-editor" onclick="openCodeEditor()">
                             <i class="fas fa-code"></i>
-                            Code Editor
+                            Advanced Editor
                         </button>
                         <button class="control-btn btn-save" onclick="saveProgress()">
-                            <i class="fas fa-save"></i>
-                            Save Progress
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            Auto-Save
                         </button>
                     </div>
                 </div>
@@ -278,112 +367,245 @@
             <div class="monitoring-panel">
                 <div class="monitor-item">
                     <i class="fas fa-clock"></i>
-                    <span>Session Time: <strong id="assessmentTimer">00:00:00</strong></span>
+                    <span>Assessment Time: <strong id="assessmentTimer">00:00:00</strong></span>
                 </div>
                 <div class="monitor-item">
                     <i class="fas fa-tasks"></i>
-                    <span>Progress: <strong id="questionProgress">1/18</strong></span>
+                    <span>Progress: <strong id="questionProgress">1/25</strong></span>
                 </div>
                 <div class="monitor-item">
                     <i class="fas fa-check-circle"></i>
-                    <span>Status: <strong class="status-ok">ACTIVE</strong></span>
+                    <span>Status: <strong class="status-ok">IN PROGRESS</strong></span>
+                </div>
+                <div class="monitor-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Integrity: <strong class="status-secure">SECURE</strong></span>
                 </div>
             </div>
 
-            <!-- Questions will be dynamically loaded here -->
+            <!-- Questions Container -->
             <div id="questionsContainer"></div>
 
             <div class="navigation-actions">
-                <button class="btn btn-primary" onclick="nextQuestion()">
-                    Next Question
-                    <i class="fas fa-arrow-right"></i>
+                <button class="btn btn-primary btn-large" onclick="nextQuestion()" id="nextButton">
+                    <span class="btn-content">
+                        Next Question
+                        <i class="fas fa-arrow-right"></i>
+                    </span>
+                    <div class="btn-subtext">Continue your assessment</div>
                 </button>
             </div>
         </section>
 
-        <!-- Section 3: Submission -->
+        <!-- Section 3: Final Submission -->
         <section id="submissionSection" class="form-section">
-            <div class="submission-header">
-                <div class="submission-icon">
-                    <i class="fas fa-check-circle"></i>
+            <div class="submission-container">
+                <div class="submission-header">
+                    <div class="submission-icon success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h1>Assessment Complete</h1>
+                    <p class="submission-subtitle">Congratulations on completing the Dexxter Services technical evaluation</p>
                 </div>
-                <h2>Application Complete</h2>
-                <p>Thank you for completing the Dexxter Services developer application.</p>
-            </div>
 
-            <div class="submission-summary">
-                <div class="summary-card">
-                    <h3><i class="fas fa-info-circle"></i> Application Summary</h3>
-                    <div id="applicationSummary"></div>
+                <div class="completion-animation">
+                    <div class="confetti"></div>
+                    <div class="confetti"></div>
+                    <div class="confetti"></div>
+                    <div class="confetti"></div>
+                    <div class="confetti"></div>
                 </div>
-                
-                <div class="summary-card">
-                    <h3><i class="fas fa-shield-alt"></i> Session Verification</h3>
-                    <div class="verification-list">
-                        <div class="verification-item success">
-                            <i class="fas fa-check"></i>
-                            <span>Session Integrity: Verified</span>
+
+                <div class="submission-summary">
+                    <div class="summary-grid">
+                        <div class="summary-card highlight">
+                            <div class="summary-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="summary-content">
+                                <h3>Performance Overview</h3>
+                                <div class="summary-stats">
+                                    <div class="stat">
+                                        <span class="stat-value" id="completionRate">0%</span>
+                                        <span class="stat-label">Completion</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-value" id="timeSpent">00:00:00</span>
+                                        <span class="stat-label">Time Spent</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-value" id="skipsUsed">0</span>
+                                        <span class="stat-label">Skips Used</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="verification-item success">
-                            <i class="fas fa-check"></i>
-                            <span>Examination Rules: Compliant</span>
+
+                        <div class="summary-card">
+                            <div class="summary-icon">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <div class="summary-content">
+                                <h3>Candidate Information</h3>
+                                <div id="applicationSummary" class="summary-details"></div>
+                            </div>
                         </div>
-                        <div class="verification-item success">
-                            <i class="fas fa-check"></i>
-                            <span>Submission Ready: Yes</span>
+                    </div>
+
+                    <div class="summary-card full-width">
+                        <div class="summary-icon">
+                            <i class="fas fa-shield-check"></i>
+                        </div>
+                        <div class="summary-content">
+                            <h3>Session Verification</h3>
+                            <div class="verification-grid">
+                                <div class="verification-item success">
+                                    <i class="fas fa-check"></i>
+                                    <div>
+                                        <strong>Session Integrity</strong>
+                                        <span>Verified and secure</span>
+                                    </div>
+                                </div>
+                                <div class="verification-item success">
+                                    <i class="fas fa-check"></i>
+                                    <div>
+                                        <strong>Rules Compliance</strong>
+                                        <span>All guidelines followed</span>
+                                    </div>
+                                </div>
+                                <div class="verification-item success">
+                                    <i class="fas fa-check"></i>
+                                    <div>
+                                        <strong>Submission Ready</strong>
+                                        <span>All data validated</span>
+                                    </div>
+                                </div>
+                                <div class="verification-item success">
+                                    <i class="fas fa-check"></i>
+                                    <div>
+                                        <strong>Technical Assessment</strong>
+                                        <span>Successfully completed</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="submission-actions">
-                <button class="btn btn-success" onclick="submitApplication()">
-                    <i class="fas fa-paper-plane"></i>
-                    Submit Application
-                </button>
+                <div class="next-steps">
+                    <h3><i class="fas fa-road"></i> Next Steps</h3>
+                    <div class="steps-timeline">
+                        <div class="step-item">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <strong>Application Review</strong>
+                                <p>Our team will thoroughly evaluate your submission</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <strong>Technical Interview</strong>
+                                <p>Selected candidates will be invited for a live coding session</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <strong>Final Decision</strong>
+                                <p>You will receive our response within 5-7 business days</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="submission-actions">
+                    <button class="btn btn-success btn-large" onclick="submitApplication()" id="submitButton">
+                        <span class="btn-content">
+                            <i class="fas fa-paper-plane"></i>
+                            Submit Final Application
+                        </span>
+                        <div class="btn-subtext">Send your completed assessment for review</div>
+                    </button>
+                    <div class="submission-note">
+                        <i class="fas fa-info-circle"></i>
+                        Your application will be immediately queued for review by our recruitment team
+                    </div>
+                </div>
             </div>
         </section>
     </main>
 
-    <!-- Code Editor Modal -->
+    <!-- Advanced Code Editor Modal -->
     <div id="codeEditorModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content large">
             <div class="modal-header">
                 <h3>
                     <i class="fas fa-code"></i>
                     Advanced Code Editor
                 </h3>
-                <button class="modal-close" onclick="closeCodeEditor()">
-                    <i class="fas fa-times"></i>
-                </button>
+                <div class="modal-controls">
+                    <button class="modal-btn" onclick="toggleFullscreen()" title="Fullscreen">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                    <button class="modal-close" onclick="closeCodeEditor()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
             <div class="modal-body">
                 <div class="editor-toolbar">
-                    <button onclick="insertCodeSnippet()" class="toolbar-btn">
-                        <i class="fas fa-plus"></i>
-                        Insert Snippet
-                    </button>
-                    <button onclick="formatCode()" class="toolbar-btn">
-                        <i class="fas fa-indent"></i>
-                        Format Code
-                    </button>
-                    <button onclick="checkSyntax()" class="toolbar-btn">
-                        <i class="fas fa-check"></i>
-                        Check Syntax
-                    </button>
-                    <select onchange="changeTheme(this.value)" class="theme-selector">
-                        <option value="dark">Dark Theme</option>
-                        <option value="monokai">Monokai</option>
-                        <option value="light">Light Theme</option>
-                    </select>
+                    <div class="toolbar-group">
+                        <button onclick="insertCodeSnippet('function')" class="toolbar-btn">
+                            <i class="fas fa-plus"></i>
+                            Function Template
+                        </button>
+                        <button onclick="insertCodeSnippet('hook')" class="toolbar-btn">
+                            <i class="fas fa-link"></i>
+                            Hook Template
+                        </button>
+                        <button onclick="insertCodeSnippet('metamethod')" class="toolbar-btn">
+                            <i class="fas fa-magic"></i>
+                            Metamethod Template
+                        </button>
+                    </div>
+                    <div class="toolbar-group">
+                        <button onclick="formatCode()" class="toolbar-btn">
+                            <i class="fas fa-indent"></i>
+                            Format Code
+                        </button>
+                        <button onclick="checkSyntax()" class="toolbar-btn">
+                            <i class="fas fa-check-double"></i>
+                            Validate Syntax
+                        </button>
+                        <select onchange="changeTheme(this.value)" class="theme-selector">
+                            <option value="dark">Dark Theme</option>
+                            <option value="monokai">Monokai Pro</option>
+                            <option value="github">GitHub Dark</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="editor-area">
-                    <textarea id="advancedEditor" placeholder="// Write your code here..."></textarea>
+                    <textarea id="advancedEditor" placeholder="-- Write your Lua code here...
+-- Use the templates above for common patterns
+-- Your code will be evaluated for efficiency and security"></textarea>
+                    <div class="editor-overlay" id="editorOverlay">
+                        <div class="overlay-content">
+                            <i class="fas fa-code"></i>
+                            <h4>Advanced Code Editor</h4>
+                            <p>Use this space to write and test your Lua scripts</p>
+                        </div>
+                    </div>
                 </div>
                 <div class="editor-footer">
                     <div class="editor-info">
-                        <span id="lineInfo">Line: 1, Column: 1</span>
-                        <span class="language-tag">Luau</span>
+                        <span id="lineInfo">Line 1, Column 1</span>
+                        <span class="language-tag">Lua</span>
+                        <span class="editor-mode" id="editorMode">Standard</span>
+                    </div>
+                    <div class="editor-stats">
+                        <span id="charCount">0 characters</span>
+                        <span id="lineCount">1 line</span>
                     </div>
                 </div>
             </div>
@@ -392,7 +614,11 @@
                     <i class="fas fa-check"></i>
                     Apply to Answer
                 </button>
-                <button onclick="closeCodeEditor()" class="btn btn-secondary">
+                <button onclick="testCode()" class="btn btn-secondary">
+                    <i class="fas fa-play"></i>
+                    Test Code
+                </button>
+                <button onclick="closeCodeEditor()" class="btn btn-outline">
                     <i class="fas fa-times"></i>
                     Cancel
                 </button>
@@ -403,8 +629,31 @@
     <!-- Notification System -->
     <div id="notification" class="notification">
         <div class="notification-content">
-            <i class="fas fa-bell"></i>
-            <span id="notificationMessage"></span>
+            <div class="notification-icon">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="notification-text">
+                <span id="notificationMessage"></span>
+            </div>
+            <button class="notification-close" onclick="hideNotification()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content small">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Confirmation Required</h3>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">Are you sure you want to proceed?</p>
+            </div>
+            <div class="modal-actions">
+                <button onclick="confirmAction(true)" class="btn btn-primary">Confirm</button>
+                <button onclick="confirmAction(false)" class="btn btn-outline">Cancel</button>
+            </div>
         </div>
     </div>
 
