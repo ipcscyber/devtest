@@ -4,7 +4,7 @@ class DexxterApplication {
         this.currentSection = 1;
         this.currentQuestion = 1;
         this.totalQuestions = 18;
-        this.skipsRemaining = 2;
+        this.skipsRemaining = Infinity;
         this.answers = {};
         this.timers = {
             session: new Timer('sessionTimer'),
@@ -12,6 +12,7 @@ class DexxterApplication {
         };
         this.securityMonitor = new SecurityMonitor();
         this.scoringSystem = new ScoringSystem();
+        this.skippedQuestions = new Set();
         
         this.init();
     }
@@ -19,7 +20,7 @@ class DexxterApplication {
     init() {
         this.timers.session.start();
         this.securityMonitor.startMonitoring();
-        this.loadPersonalInfoSection();
+        this.showRulesSection();
         this.setupEventListeners();
     }
 
@@ -39,10 +40,26 @@ class DexxterApplication {
         document.addEventListener('paste', (e) => {
             this.securityMonitor.logSuspiciousActivity('PASTE_ACTION');
         });
+
+        // Prevent going back
+        window.addEventListener('popstate', (e) => {
+            window.history.forward();
+        });
+    }
+
+    showRulesSection() {
+        this.showSection('rulesSection');
+        document.getElementById('progressSection').style.display = 'none';
+    }
+
+    startApplication() {
+        this.showSection('personalInfoSection');
+        document.getElementById('progressSection').style.display = 'block';
+        this.updateProgress(33);
     }
 
     loadPersonalInfoSection() {
-        this.showSection(1);
+        this.showSection('personalInfoSection');
         this.updateProgress(33);
     }
 
@@ -52,7 +69,7 @@ class DexxterApplication {
             return;
         }
 
-        this.showSection(2);
+        this.showSection('technicalTestSection');
         this.timers.assessment.start();
         this.updateProgress(66);
         this.loadQuestion(1);
@@ -111,7 +128,7 @@ class DexxterApplication {
         
         // AI detection on text answers
         if (type === 'text') {
-            this.securityMonitor.detectAIContent(value);
+            this.securityMonitor.detectAIContent(value, questionId);
         }
     }
 
@@ -123,31 +140,32 @@ class DexxterApplication {
         if (this.currentQuestion < this.totalQuestions) {
             this.loadQuestion(this.currentQuestion + 1);
         } else {
-            this.showSubmissionSection();
-        }
-    }
-
-    previousQuestion() {
-        if (this.currentQuestion > 1) {
-            this.loadQuestion(this.currentQuestion - 1);
+            // Check if there are skipped questions
+            const skipped = Array.from(this.skippedQuestions);
+            if (skipped.length > 0) {
+                this.loadQuestion(skipped[0]);
+                this.skippedQuestions.delete(skipped[0]);
+            } else {
+                this.showSubmissionSection();
+            }
         }
     }
 
     skipQuestion() {
-        if (this.skipsRemaining > 0) {
-            this.skipsRemaining--;
-            this.updateSkipCounter();
-            this.nextQuestion();
-            this.securityMonitor.logSuspiciousActivity('QUESTION_SKIPPED');
+        this.skippedQuestions.add(this.currentQuestion);
+        this.showNotification('Question skipped. You can return to it later.');
+        
+        if (this.currentQuestion < this.totalQuestions) {
+            this.loadQuestion(this.currentQuestion + 1);
         } else {
-            this.showNotification('No skips remaining', 'warning');
-        }
-    }
-
-    updateSkipCounter() {
-        const skipBtn = document.querySelector('.skip-counter');
-        if (skipBtn) {
-            skipBtn.textContent = `(${this.skipsRemaining})`;
+            // Go to first skipped question or finish
+            const skipped = Array.from(this.skippedQuestions);
+            if (skipped.length > 0) {
+                this.loadQuestion(skipped[0]);
+                this.skippedQuestions.delete(skipped[0]);
+            } else {
+                this.showSubmissionSection();
+            }
         }
     }
 
@@ -155,13 +173,14 @@ class DexxterApplication {
         this.securityMonitor.sendAdminAlert('HELP_REQUEST', {
             question: this.currentQuestion,
             time_elapsed: this.timers.assessment.getElapsedTime(),
-            candidate: document.getElementById('robloxUsername').value
+            candidate: document.getElementById('robloxUsername').value,
+            question_text: QUESTIONS[this.currentQuestion - 1].text.substring(0, 200)
         });
-        this.showNotification('Admin has been notified. Please wait for assistance.');
+        this.showNotification('Assistance request sent. Please wait for support.');
     }
 
     showSubmissionSection() {
-        this.showSection(3);
+        this.showSection('submissionSection');
         this.updateProgress(100);
         this.generateApplicationSummary();
     }
@@ -169,6 +188,7 @@ class DexxterApplication {
     generateApplicationSummary() {
         const summary = document.getElementById('applicationSummary');
         const personalInfo = this.getPersonalInfo();
+        const answeredQuestions = Object.keys(this.answers).length;
         
         summary.innerHTML = `
             <div class="summary-item">
@@ -178,42 +198,106 @@ class DexxterApplication {
                 <strong>Roblox Username:</strong> ${personalInfo.robloxUsername}
             </div>
             <div class="summary-item">
-                <strong>Questions Completed:</strong> ${Object.keys(this.answers).length}/${this.totalQuestions}
+                <strong>Questions Completed:</strong> ${answeredQuestions}/${this.totalQuestions}
             </div>
             <div class="summary-item">
                 <strong>Time Spent:</strong> ${this.timers.assessment.getElapsedTime()}
             </div>
+            <div class="summary-item">
+                <strong>Skipped Questions:</strong> ${this.skippedQuestions.size}
+            </div>
         `;
     }
 
-    submitApplication() {
+    async submitApplication() {
         const finalScore = this.scoringSystem.calculateFinalScore(this.answers);
         const grade = this.scoringSystem.getFinalGrade(finalScore);
+        const personalInfo = this.getPersonalInfo();
         
-        this.securityMonitor.sendAdminAlert('APPLICATION_SUBMITTED', {
-            candidate: this.getPersonalInfo(),
-            score: finalScore,
-            grade: grade,
-            answers: this.answers
-        });
-
-        this.showNotification('Application submitted successfully! We will contact you soon.', 'success');
+        // Create application file
+        const applicationData = this.createApplicationFile(personalInfo, finalScore, grade);
+        
+        // Send to Discord
+        await this.securityMonitor.sendApplicationSubmission(applicationData, personalInfo, finalScore, grade);
+        
+        this.showNotification('Application submitted successfully! We will review your submission and contact you soon.', 'success');
         
         // Disable further edits
         document.querySelectorAll('button').forEach(btn => btn.disabled = true);
     }
 
-    showSection(sectionNumber) {
+    createApplicationFile(personalInfo, score, grade) {
+        let fileContent = `Dexxter Services - Developer Application\n`;
+        fileContent += `Submission Date: ${new Date().toLocaleString()}\n`;
+        fileContent += `============================================\n\n`;
+        
+        fileContent += `PERSONAL INFORMATION:\n`;
+        fileContent += `Full Name: ${personalInfo.fullName}\n`;
+        fileContent += `Roblox Username: ${personalInfo.robloxUsername}\n`;
+        fileContent += `Discord ID: ${personalInfo.discordId}\n`;
+        fileContent += `Age: ${personalInfo.age}\n`;
+        fileContent += `Nationality: ${personalInfo.nationality}\n`;
+        fileContent += `Timezone: ${personalInfo.timezone}\n`;
+        fileContent += `Availability: ${personalInfo.availability} hours/week\n`;
+        fileContent += `Experience: ${personalInfo.experience} years\n`;
+        fileContent += `Portfolio: ${personalInfo.portfolio || 'Not provided'}\n\n`;
+        fileContent += `Motivation:\n${personalInfo.motivation}\n\n`;
+        
+        fileContent += `TECHNICAL ASSESSMENT RESULTS:\n`;
+        fileContent += `Final Score: ${score}/100\n`;
+        fileContent += `Grade: ${grade}\n`;
+        fileContent += `Time Spent: ${this.timers.assessment.getElapsedTime()}\n`;
+        fileContent += `Questions Answered: ${Object.keys(this.answers).length}/${this.totalQuestions}\n\n`;
+        
+        fileContent += `ANSWERS:\n`;
+        fileContent += `============================================\n\n`;
+        
+        QUESTIONS.forEach((question, index) => {
+            const answer = this.answers[index + 1];
+            fileContent += `QUESTION ${index + 1}/${this.totalQuestions} (${question.points} points):\n`;
+            fileContent += `${question.text}\n\n`;
+            
+            if (answer?.text) {
+                fileContent += `TEXT ANSWER:\n${answer.text}\n\n`;
+            }
+            
+            if (answer?.code) {
+                fileContent += `CODE ANSWER:\n${answer.code}\n\n`;
+            }
+            
+            if (!answer) {
+                fileContent += `STATUS: Not answered\n\n`;
+            }
+            
+            fileContent += `--------------------------------------------\n\n`;
+        });
+        
+        fileContent += `SESSION DATA:\n`;
+        fileContent += `Session ID: ${this.securityMonitor.sessionId}\n`;
+        fileContent += `Start Time: ${new Date(this.timers.assessment.startTime).toLocaleString()}\n`;
+        fileContent += `End Time: ${new Date().toLocaleString()}\n`;
+        fileContent += `Suspicious Activities: ${this.securityMonitor.suspiciousActivities.length}\n`;
+        
+        return fileContent;
+    }
+
+    showSection(sectionId) {
         document.querySelectorAll('.form-section').forEach(section => {
             section.classList.remove('active');
         });
         
-        document.getElementById(['personalInfoSection', 'technicalTestSection', 'submissionSection'][sectionNumber - 1]).classList.add('active');
+        document.getElementById(sectionId).classList.add('active');
         
-        // Update progress steps
-        document.querySelectorAll('.step').forEach((step, index) => {
-            step.classList.toggle('active', index < sectionNumber);
-        });
+        // Update progress steps for non-rules sections
+        if (sectionId !== 'rulesSection') {
+            const stepNumber = 
+                sectionId === 'personalInfoSection' ? 1 :
+                sectionId === 'technicalTestSection' ? 2 : 3;
+                
+            document.querySelectorAll('.step').forEach((step, index) => {
+                step.classList.toggle('active', index < stepNumber);
+            });
+        }
     }
 
     updateProgress(percentage) {
@@ -246,9 +330,19 @@ class DexxterApplication {
         messageEl.textContent = message;
         notification.style.display = 'block';
         
+        // Style based on type
+        notification.style.borderLeftColor = 
+            type === 'error' ? 'var(--error-red)' :
+            type === 'success' ? 'var(--success-green)' :
+            type === 'warning' ? 'var(--warning-orange)' : 'var(--primary-blue)';
+        
         setTimeout(() => {
             notification.style.display = 'none';
         }, 5000);
+    }
+
+    updateNavigation() {
+        // No need for previous button anymore
     }
 }
 
@@ -294,6 +388,7 @@ class SecurityMonitor {
     constructor() {
         this.webhookUrl = 'https://discord.com/api/webhooks/1392061559202779186/6Bw4CMy4HLBoTygCfLKpImVfr0QgUODNHMY_10BTRklXVoaj91H5-2U4pDE8wdbgy1m1';
         this.suspiciousActivities = [];
+        this.sessionId = this.generateSessionId();
     }
 
     startMonitoring() {
@@ -301,17 +396,30 @@ class SecurityMonitor {
         this.monitorFocus();
     }
 
-    detectAIContent(text) {
+    detectAIContent(text, questionId) {
         const aiPatterns = [
             /as an AI language model/i,
             /I am an AI assistant/i,
             /according to my knowledge/i,
             /based on the information/i,
-            /I don't have personal opinions/i
+            /I don't have personal opinions/i,
+            /as a large language model/i,
+            /I am designed to/i,
+            /my purpose is to/i,
+            /I cannot provide/i,
+            /I do not have the ability/i
         ];
 
         if (aiPatterns.some(pattern => pattern.test(text))) {
-            this.logSuspiciousActivity('AI_CONTENT_DETECTED', { text: text.substring(0, 100) });
+            this.logSuspiciousActivity('AI_CONTENT_DETECTED', { 
+                text: text.substring(0, 200),
+                questionId: questionId
+            });
+            this.sendAdminAlert('AI_DETECTION', {
+                question: questionId,
+                excerpt: text.substring(0, 200),
+                session_id: this.sessionId
+            });
             return true;
         }
         return false;
@@ -341,8 +449,19 @@ class SecurityMonitor {
     }
 
     monitorFocus() {
+        let tabSwitchCount = 0;
+        let lastSwitchTime = 0;
+
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
+                tabSwitchCount++;
+                const now = Date.now();
+                
+                if (now - lastSwitchTime < 5000) { // Multiple quick switches
+                    this.logSuspiciousActivity('MULTIPLE_TAB_SWITCHES', { count: tabSwitchCount });
+                }
+                
+                lastSwitchTime = now;
                 this.logSuspiciousActivity('TAB_SWITCH_DETECTED');
             }
         });
@@ -360,57 +479,132 @@ class SecurityMonitor {
             timestamp: new Date().toISOString(),
             data
         });
-
-        // Send immediate alert for critical activities
-        if (['AI_CONTENT_DETECTED', 'MULTIPLE_TAB_SWITCHES'].includes(type)) {
-            this.sendAdminAlert('SUSPICIOUS_ACTIVITY', { type, data });
-        }
     }
 
     sendAdminAlert(alertType, data) {
         const alertData = {
             type: alertType,
             timestamp: new Date().toISOString(),
-            session_id: this.generateSessionId(),
+            session_id: this.sessionId,
             ...data
         };
 
-        // Send to Discord webhook
+        let embedColor;
+        let title;
+
+        switch (alertType) {
+            case 'HELP_REQUEST':
+                embedColor = 0x0099ff;
+                title = '🆗 Assistance Request';
+                break;
+            case 'AI_DETECTION':
+                embedColor = 0xff0000;
+                title = '🚨 AI Content Detected';
+                break;
+            case 'APPLICATION_SUBMITTED':
+                embedColor = 0x00ff00;
+                title = '✅ Application Submitted';
+                break;
+            default:
+                embedColor = 0xffff00;
+                title = '⚠️ Security Alert';
+        }
+
+        const embed = {
+            title: title,
+            color: embedColor,
+            fields: [],
+            timestamp: new Date().toISOString(),
+            footer: { text: `Session: ${this.sessionId}` }
+        };
+
+        // Add fields based on alert type
+        if (data.candidate) {
+            embed.fields.push({
+                name: 'Candidate',
+                value: `**Username:** ${data.candidate.robloxUsername || 'Unknown'}\n**Discord:** ${data.candidate.discordId || 'Unknown'}`,
+                inline: false
+            });
+        }
+
+        if (data.question) {
+            embed.fields.push({
+                name: 'Question',
+                value: `#${data.question}`,
+                inline: true
+            });
+        }
+
+        if (data.time_elapsed) {
+            embed.fields.push({
+                name: 'Time Elapsed',
+                value: data.time_elapsed,
+                inline: true
+            });
+        }
+
+        if (data.score) {
+            embed.fields.push({
+                name: 'Results',
+                value: `**Score:** ${data.score}/100\n**Grade:** ${data.grade}`,
+                inline: false
+            });
+        }
+
+        if (data.excerpt) {
+            embed.fields.push({
+                name: 'Content Excerpt',
+                value: `\`\`\`${data.excerpt}\`\`\``,
+                inline: false
+            });
+        }
+
         fetch(this.webhookUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                content: `🚨 **Dexxter Services Alert** - ${alertType}`,
-                embeds: [{
-                    title: 'Security Alert',
-                    color: 0xff0000,
-                    fields: [
-                        {
-                            name: 'Alert Type',
-                            value: alertType,
-                            inline: true
-                        },
-                        {
-                            name: 'Candidate',
-                            value: data.candidate || 'Unknown',
-                            inline: true
-                        },
-                        {
-                            name: 'Timestamp',
-                            value: new Date().toLocaleString(),
-                            inline: true
-                        }
-                    ],
-                    timestamp: new Date().toISOString()
-                }]
-            })
+            body: JSON.stringify({ embeds: [embed] })
         }).catch(error => console.error('Error sending alert:', error));
     }
 
+    async sendApplicationSubmission(applicationData, personalInfo, score, grade) {
+        // Create a Blob with the application data
+        const blob = new Blob([applicationData], { type: 'text/plain' });
+        const file = new File([blob], `application_${personalInfo.robloxUsername}_${this.sessionId}.txt`, { type: 'text/plain' });
+
+        // Create form data for file upload
+        const formData = new FormData();
+        formData.append('file', file);
+
+        // First, send the main application alert
+        this.sendAdminAlert('APPLICATION_SUBMITTED', {
+            candidate: personalInfo,
+            score: score,
+            grade: grade,
+            time_elapsed: app.timers.assessment.getElapsedTime(),
+            questions_answered: Object.keys(app.answers).length,
+            suspicious_activities: this.suspiciousActivities.length
+        });
+
+        // Then send the file (you might need a different webhook or method for files)
+        // For now, we'll just log it since Discord webhooks don't support file uploads directly
+        console.log('Application file content:', applicationData);
+        
+        // You would typically send this to a server endpoint that can handle file uploads
+        // For demonstration, we'll create a download link
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Dexxter_Application_${personalInfo.robloxUsername}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
     generateSessionId() {
-        return 'DXT-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        return 'DXT-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9).toUpperCase();
     }
 }
 
@@ -479,17 +673,17 @@ class ScoringSystem {
     }
 
     containsTechnicalTerms(text) {
-        const terms = ['metamethod', 'hook', 'exploit', 'remote', 'client', 'server', 'protection', 'bypass'];
+        const terms = ['metamethod', 'hook', 'exploit', 'remote', 'client', 'server', 'protection', 'bypass', 'luau', 'script', 'roblox'];
         return terms.some(term => text.toLowerCase().includes(term));
     }
 
     isValidLuaSyntax(code) {
         // Basic Lua syntax check
-        return code.includes('function') || code.includes('local') || code.includes('=');
+        return code.includes('function') || code.includes('local') || code.includes('=') || code.includes('--');
     }
 
     containsAdvancedConcepts(code) {
-        const concepts = ['hookmetamethod', 'getrawmetatable', 'newcclosure', 'checkcaller', 'protectgui'];
+        const concepts = ['hookmetamethod', 'getrawmetatable', 'newcclosure', 'checkcaller', 'protectgui', '__namecall', '__index', 'getgenv'];
         return concepts.some(concept => code.includes(concept));
     }
 
@@ -613,6 +807,24 @@ const QUESTIONS = [
     }
 ];
 
+// Global functions for HTML onclick handlers
+function toggleStartButton() {
+    const agreeCheckbox = document.getElementById('agreeRules');
+    const startButton = document.getElementById('startApplicationBtn');
+    startButton.disabled = !agreeCheckbox.checked;
+}
+
+function startApplication() {
+    app.startApplication();
+}
+
+function startTechnicalTest() { app.startTechnicalTest(); }
+function nextQuestion() { app.nextQuestion(); }
+function skipQuestion() { app.skipQuestion(); }
+function callAdmin() { app.callAdmin(); }
+function saveProgress() { app.showNotification('Progress saved successfully!'); }
+function submitApplication() { app.submitApplication(); }
+
 // Code Editor Functions
 function openCodeEditor() {
     document.getElementById('codeEditorModal').style.display = 'block';
@@ -625,6 +837,11 @@ function closeCodeEditor() {
 function applyCode() {
     const code = document.getElementById('advancedEditor').value;
     // Apply code to current question's code answer
+    const currentCodeAnswer = document.querySelector('.code-answer');
+    if (currentCodeAnswer) {
+        currentCodeAnswer.value = code;
+        app.saveAnswer(app.currentQuestion, 'code', code);
+    }
     closeCodeEditor();
 }
 
@@ -636,15 +853,16 @@ function formatCode() {
     editor.value = code;
 }
 
+function changeTheme(theme) {
+    const editor = document.getElementById('advancedEditor');
+    editor.className = theme + '-theme';
+}
+
 // Initialize Application
 const app = new DexxterApplication();
 
-// Global functions for HTML onclick handlers
-function startTechnicalTest() { app.startTechnicalTest(); }
-function nextQuestion() { app.nextQuestion(); }
-function previousQuestion() { app.previousQuestion(); }
-function skipQuestion() { app.skipQuestion(); }
-function callAdmin() { app.callAdmin(); }
-function saveProgress() { app.showNotification('Progress saved successfully!'); }
-function submitApplication() { app.submitApplication(); }
-function reviewApplication() { app.showSection(2); }
+// Prevent going back in browser history
+history.pushState(null, null, location.href);
+window.onpopstate = function(event) {
+    history.go(1);
+};
